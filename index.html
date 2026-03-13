@@ -1,4 +1,24 @@
-import { useState, useRef, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Bablo Learning AI 🐼</title>
+  <meta name="description" content="Bablo Learning AI - Your Smart AI Language Tutor"/>
+  <!-- React + Babel from CDN — no build needed -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F0F4FF; font-family: 'Nunito', sans-serif; }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
 
 const BOOKS = [
   { id:1, type:"comic", emoji:"🦁", color:["#FF6B6B","#FF8C42"], titleEn:"The Brave Lion", titleUr:"بہادر شیر", level:"Beginner", descEn:"A lion learns true courage.", descUr:"بہادری کا سبق۔",
@@ -204,7 +224,7 @@ function PandaMascot({ size = 80, animate = false }) {
   );
 }
 
-export default function BabloApp() {
+function BabloApp() {
   const [lang, setLang] = useState("en");
   const [page, setPage] = useState("home");
   const [nav,  setNav]  = useState("home");
@@ -224,7 +244,7 @@ export default function BabloApp() {
     <div style={{direction:isRTL?"rtl":"ltr"}}>
       <div style={{background:"linear-gradient(135deg,#4F8EF7,#6C63FF 55%,#FF6B6B)",borderRadius:26,padding:"28px 20px 22px",textAlign:"center",marginBottom:18,position:"relative",overflow:"hidden",boxShadow:"0 8px 32px rgba(79,142,247,0.3)",animation:"fadeUp 0.5s ease"}}>
         <PandaMascot size={84} animate/>
-        <h1 style={{color:"white",margin:"6px 0 3px",fontSize:"1.45rem",fontFamily:"'Nunito',sans-serif",fontWeight:900}}>Learning & Study with Bablo</h1>
+        <h1 style={{color:"white",margin:"6px 0 3px",fontSize:"1.45rem",fontFamily:"'Nunito',sans-serif",fontWeight:900}}>Bablo Learning AI</h1>
         <p style={{color:"rgba(255,255,255,0.85)",margin:"0 0 14px",fontSize:"0.87rem"}}>Your Smart AI Language Tutor 🐼</p>
         <div style={{display:"flex",gap:6,justifyContent:"center",flexWrap:"wrap"}}>
           {[["en","🇬🇧","English"],["enur","🌐","EN + اردو"],["ur","🕌","اردو"]].map(([k,f,l])=>(
@@ -713,7 +733,7 @@ export default function BabloApp() {
       <div style={{...card,background:"linear-gradient(135deg,#F5F0FF,#F0F5FF)",border:`2px solid ${C.sec}20`}}>
         <div style={{fontSize:"0.77rem",color:C.mut,marginBottom:2}}>Created by</div>
         <div style={{fontWeight:900,color:C.sec,fontSize:"1.1rem",fontFamily:"'Nunito',sans-serif"}}>Muhammad Usman</div>
-        <div style={{fontSize:"0.69rem",color:C.mut,marginTop:3}}>🐼 Bablo Learning Platform · 2024</div>
+        <div style={{fontSize:"0.69rem",color:C.mut,marginTop:3}}>🐼 Bablo Learning AI · 2026</div>
       </div>
     </div>
   );
@@ -755,7 +775,7 @@ export default function BabloApp() {
             <PandaMascot size={32}/>
             <div>
               <div style={{fontWeight:900,color:"#4F8EF7",fontSize:"0.91rem",lineHeight:1,fontFamily:"'Nunito',sans-serif"}}>Bablo{lang!=="en"?" | بابلو":""}</div>
-              <div style={{fontSize:"0.56rem",color:"#9CA3AF",lineHeight:1}}>Study · Learn · Grow</div>
+              <div style={{fontSize:"0.56rem",color:"#9CA3AF",lineHeight:1}}>Bablo Learning AI</div>
             </div>
           </div>
           <div style={{display:"flex",gap:5,alignItems:"center"}}>
@@ -781,3 +801,9 @@ export default function BabloApp() {
     </>
   );
 }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<BabloApp />);
+  </script>
+</body>
+</html>
