@@ -1,24 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>Bablo Learning AI 🐼</title>
-  <meta name="description" content="Bablo Learning AI - Your Smart AI Language Tutor"/>
-  <!-- React + Babel from CDN — no build needed -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #F0F4FF; font-family: 'Nunito', sans-serif; }
-    #root { min-height: 100vh; }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+import { useState, useRef, useEffect } from "react";
 
 const BOOKS = [
   { id:1, type:"comic", emoji:"🦁", color:["#FF6B6B","#FF8C42"], titleEn:"The Brave Lion", titleUr:"بہادر شیر", level:"Beginner", descEn:"A lion learns true courage.", descUr:"بہادری کا سبق۔",
@@ -224,7 +204,7 @@ function PandaMascot({ size = 80, animate = false }) {
   );
 }
 
-function BabloApp() {
+export default function BabloApp() {
   const [lang, setLang] = useState("en");
   const [page, setPage] = useState("home");
   const [nav,  setNav]  = useState("home");
@@ -347,225 +327,218 @@ function BabloApp() {
   };
 
 
-  /* ── AI CHAT with Mic Buttons ── */
+  /* ── BABLO AI TUTOR — POWERFUL VERSION ── */
   const Speaking = () => {
-    const [msgs,setMsgs]=useState([{r:"ai",t:"Hello! I am Bablo 🐼 your friendly AI English tutor!\n\nType below OR tap the 🎤 mic button to speak — in English or Urdu! Let's learn together! 🚀"}]);
-    const [input,setInput]=useState("");
-    const [loading,setLoading]=useState(false);
-    const [chatLang,setChatLang]=useState("en");
-    const [listening,setListening]=useState(false);
-    const [micStatus,setMicStatus]=useState("idle"); // idle | listening | error
-    const endRef=useRef(null);
-    const recogRef=useRef(null);
-    useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,loading]);
+    const [msgs, setMsgs] = useState([{r:"ai",t:"Assalam o Alaikum! 🐼 Main Bablo hoon — aapka AI English tutor!\n\nMujhse kuch bhi puchein:\n• English grammar aur vocabulary\n• Apni baat correct karwayein\n• Urdu mein bhi baat kar saktay hain\n• Koi bhi topic — main sikhaunga!\n\nAb bolo — kya seekhna hai aaj? 🚀"}]);
+    const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [chatLang, setChatLang] = useState("en");
+    const [listening, setListening] = useState(false);
+    const [micNote, setMicNote] = useState("");
+    const endRef = useRef(null);
+    const recogRef = useRef(null);
+    const inputRef = useRef(null);
+    useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
 
-    const send=async(quickTxt)=>{
-      const text=(quickTxt||input).trim();
-      if(!text||loading)return;
-      setInput("");
-      setMsgs(m=>[...m,{r:"user",t:text}]);
+    const send = async (forceTxt) => {
+      const text = (forceTxt !== undefined ? forceTxt : input).trim();
+      if (!text || loading) return;
+      setInput(""); setMicNote("");
+      const userMsg = { r: "user", t: text };
+      const newMsgs = [...msgs, userMsg];
+      setMsgs(newMsgs);
       setLoading(true);
-      const sys=chatLang==="ur"
-        ?"تم بابلو ہو — ایک گرمجوش دوستانہ AI پانڈا انگریزی استاد۔ ہمیشہ 2-3 مختصر جملوں میں جواب دو۔ غلطیاں آہستہ سے درست کرو۔ آخر میں ایک مشق کا انگریزی جملہ دو۔ حوصلہ افزا رہو۔"
-        :"You are Bablo — a warm fun AI panda English tutor 🐼. Reply in 2-3 short sentences only. Gently correct grammar mistakes. End with ONE fun practice sentence for the student to try saying aloud. Be encouraging and enthusiastic!";
-      try{
-        const history=msgs.slice(-8).map(m=>({role:m.r==="ai"?"assistant":"user",content:m.t}));
-        const res=await fetch("https://api.anthropic.com/v1/messages",{
-          method:"POST",headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:250,system:sys,
-            messages:[...history,{role:"user",content:text}]})});
-        const d=await res.json();
-        const reply=d?.content?.[0]?.text||"Keep going — you are doing amazing! 🐼";
-        setMsgs(m=>[...m,{r:"ai",t:reply}]);
-      }catch{
-        const fb=chatLang==="ur"
-          ?"شاباش! مشق جاری رکھیں۔ 🐼\nکہیں: 'I practise English every single day!'"
-          :"Great effort! Keep practising! 🐼\nTry: 'I practise English every single day!'";
-        setMsgs(m=>[...m,{r:"ai",t:fb}]);
+      const history = newMsgs.slice(-12).map(m => ({ role: m.r === "ai" ? "assistant" : "user", content: m.t }));
+      const sys = chatLang === "ur"
+        ? `تم بابلو ہو — ایک ذہین AI پانڈا انگریزی اور اردو استاد۔ قوانین: 1) ہر بار نیا مختلف جواب دو، کبھی repeat مت کرو 2) صارف کی بات غور سے سمجھو اور اسی موضوع پر جواب دو 3) اردو سمجھو، انگریزی بھی سکھاؤ 4) 3-4 جملے جواب دو 5) آخر میں ایک سوال پوچھو 6) حوصلہ افزا رہو۔ کبھی بھی ایک جیسا جواب repeat نہ کرو۔`
+        : `You are Bablo — a highly intelligent warm AI panda English tutor with full knowledge like ChatGPT. RULES: 1) NEVER repeat the same answer — always give fresh unique responses 2) Read user message carefully and respond SPECIFICALLY to what they said 3) Understand Urdu/Hindi and reply helpfully 4) Gently correct grammar mistakes 5) Give 3-4 sentence responses 6) End with a follow-up question 7) Vary your tone and content completely each time — never say the same phrase twice.`;
+      try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 400, system: sys, messages: history })
+        });
+        const d = await res.json();
+        const reply = d?.content?.[0]?.text;
+        if (reply) { setMsgs(m => [...m, { r: "ai", t: reply }]); }
+        else throw new Error("empty");
+      } catch {
+        setMsgs(m => [...m, { r: "ai", t: chatLang === "ur" ? "Maafi! Connection issue tha. Dobara puchein 🐼" : "Sorry, connection issue! Please try again 🐼" }]);
       }
       setLoading(false);
     };
 
-    const tryMic=()=>{
-      setMicStatus("idle");
-      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-      if(!SR){setMicStatus("error");return;}
-      if(listening){recogRef.current?.stop();setListening(false);setMicStatus("idle");return;}
-      const r=new SR();
-      recogRef.current=r;
-      r.lang=chatLang==="ur"?"ur-PK":"en-US";
-      r.continuous=false; r.interimResults=false;
-      r.onstart=()=>{setListening(true);setMicStatus("listening");};
-      r.onend=()=>{setListening(false);setMicStatus("idle");};
-      r.onerror=(e)=>{
-        setListening(false);
-        setMicStatus(e.error==="not-allowed"?"blocked":"error");
-      };
-      r.onresult=(e)=>{
-        const t=e.results[0][0].transcript;
-        setInput(t);
-        setTimeout(()=>send(t),300);
+    const startSmallMic = () => {
+      setMicNote("");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { setMicNote("❌ Use Chrome browser for voice input."); return; }
+      if (listening) { recogRef.current?.stop(); setListening(false); return; }
+      const r = new SR(); recogRef.current = r;
+      r.lang = chatLang === "ur" ? "ur-PK" : "en-US";
+      r.continuous = false; r.interimResults = false;
+      r.onstart = () => setListening(true);
+      r.onend = () => setListening(false);
+      r.onerror = (e) => { setListening(false); setMicNote(e.error === "not-allowed" ? "🔒 Allow mic: Chrome → 🔒 lock icon → Microphone Allow" : "❌ Try again."); };
+      r.onresult = (e) => {
+        const t = e.results[0][0].transcript;
+        setInput(t); inputRef.current?.focus();
+        setMicNote("✅ Voice typed! Check then tap ➤ send.");
       };
       r.start();
     };
 
-    const micStatusMsg=micStatus==="blocked"
-      ?"🔒 Mic blocked. In Chrome: tap 🔒 in address bar → allow microphone."
-      :micStatus==="error"
-      ?"❌ Mic not supported. Please type instead."
-      :null;
+    const startBigMic = () => {
+      setMicNote("");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { setMicNote("❌ Use Chrome for voice."); return; }
+      if (listening) { recogRef.current?.stop(); setListening(false); return; }
+      const r = new SR(); recogRef.current = r;
+      r.lang = chatLang === "ur" ? "ur-PK" : "en-US";
+      r.continuous = false; r.interimResults = false;
+      r.onstart = () => setListening(true);
+      r.onend = () => setListening(false);
+      r.onerror = (e) => { setListening(false); setMicNote(e.error === "not-allowed" ? "🔒 Allow mic in Chrome settings." : "❌ Try again."); };
+      r.onresult = (e) => { send(e.results[0][0].transcript); }; // AUTO SEND
+      r.start();
+    };
 
-    const quickBtns=chatLang==="en"
-      ?["Hello Bablo! 👋","Correct my English","Tell me a story","What does 'eloquent' mean?","Help me with grammar","How do I introduce myself?"]
-      :["ہیلو بابلو! 👋","میری انگریزی درست کریں","مجھے گرامر سکھائیں","ایک کہانی سنائیں"];
+    const quickBtns = chatLang === "en"
+      ? ["Hello! Who are you? 👋", "Teach me a grammar rule", "Difference between 'since' and 'for'?", "Make a sentence with 'however'", "Tell me an interesting story", "How to speak more confidently?"]
+      : ["آپ کون ہیں؟ 👋", "مجھے گرامر سکھائیں", "انگریزی بولنا کیسے سیکھوں؟", "ایک دلچسپ کہانی سنائیں"];
 
-    return(
-      <div style={{direction:isRTL?"rtl":"ltr"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-          <button style={btnS()} onClick={()=>setPage("home")}>← Back</button>
-          <h2 style={{margin:0,fontFamily:"'Nunito',sans-serif",color:C.txt,fontSize:"1.05rem"}}>🤖 Chat with Bablo AI</h2>
+    return (
+      <div style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <button style={btnS()} onClick={() => setPage("home")}>← Back</button>
+          <div>
+            <h2 style={{ margin: 0, fontFamily: "'Nunito',sans-serif", color: C.txt, fontSize: "1.05rem" }}>🤖 Bablo AI Tutor</h2>
+            <div style={{ fontSize: "0.65rem", color: C.grn, fontWeight: 700 }}>● Powered by Claude AI — Always fresh answers</div>
+          </div>
         </div>
 
-        {/* Language toggle */}
-        <div style={{...card,marginBottom:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-          <span style={{fontSize:"0.76rem",color:C.mut,fontWeight:700}}>Chat in:</span>
-          <button onClick={()=>setChatLang("en")} style={{...btnS(C.pri),padding:"5px 13px",fontSize:"0.76rem",background:chatLang==="en"?C.pri:"transparent",color:chatLang==="en"?"white":C.pri}}>🇬🇧 English</button>
-          <button onClick={()=>setChatLang("ur")} style={{...btnS(C.sec),padding:"5px 13px",fontSize:"0.76rem",background:chatLang==="ur"?C.sec:"transparent",color:chatLang==="ur"?"white":C.sec}}>🔤 Urdu</button>
-          <span style={{fontSize:"0.68rem",color:C.mut}}>{chatLang==="en"?"Bablo replies in English":"بابلو اردو میں جواب دے گا"}</span>
+        <div style={{ ...card, marginBottom: 12, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontSize: "0.76rem", color: C.mut, fontWeight: 700 }}>Chat in:</span>
+          <button onClick={() => setChatLang("en")} style={{ ...btnS(C.pri), padding: "5px 13px", fontSize: "0.76rem", background: chatLang === "en" ? C.pri : "transparent", color: chatLang === "en" ? "white" : C.pri }}>🇬🇧 English</button>
+          <button onClick={() => setChatLang("ur")} style={{ ...btnS(C.sec), padding: "5px 13px", fontSize: "0.76rem", background: chatLang === "ur" ? C.sec : "transparent", color: chatLang === "ur" ? "white" : C.sec }}>🇵🇰 Urdu</button>
+          <button onClick={() => setMsgs([{ r: "ai", t: "New chat started! 🐼 What would you like to learn today?" }])} style={{ ...btnS(C.acc), padding: "5px 10px", fontSize: "0.7rem", marginLeft: "auto" }}>🔄 New Chat</button>
         </div>
 
-        {/* BIG AI MIC BUTTON */}
-        <div style={{textAlign:"center",marginBottom:14}}>
-          <div style={{position:"relative",width:130,height:130,margin:"0 auto",cursor:"pointer"}} onClick={tryMic}>
-            {listening&&[0,1,2].map(i=>(
-              <div key={i} style={{position:"absolute",inset:-(i+1)*12,borderRadius:"50%",border:`2px solid rgba(255,80,80,${0.4-i*0.12})`,animation:`ringOut 1.6s ${i*0.3}s ease-out infinite`,pointerEvents:"none"}}/>
+        {/* BIG MIC BUTTON — speaks and auto-sends */}
+        <div style={{ textAlign: "center", marginBottom: 14 }}>
+          <div style={{ position: "relative", width: 130, height: 130, margin: "0 auto", cursor: "pointer" }} onClick={startBigMic}>
+            {listening && [0, 1, 2].map(i => (
+              <div key={i} style={{ position: "absolute", inset: -(i + 1) * 12, borderRadius: "50%", border: `2px solid rgba(255,80,80,${0.4 - i * 0.12})`, animation: `ringOut 1.6s ${i * 0.3}s ease-out infinite`, pointerEvents: "none" }} />
             ))}
             <div style={{
-              width:130,height:130,borderRadius:"50%",
-              background:listening
-                ?"linear-gradient(135deg,#FF6B6B,#EE1111)"
-                :loading
-                ?"linear-gradient(135deg,#F59E0B,#EF4444)"
-                :"linear-gradient(135deg,#4F8EF7 0%,#6C63FF 55%,#A855F7 100%)",
-              boxShadow:listening
-                ?"0 0 50px rgba(255,80,80,0.5),0 8px 30px rgba(255,80,80,0.3)"
-                :"0 8px 40px rgba(79,142,247,0.45)",
-              display:"flex",alignItems:"center",justifyContent:"center",
-              transition:"all 0.3s",position:"relative",overflow:"hidden",
-              animation:loading?"pulseSoft 1s ease-in-out infinite":listening?"micBounce 0.5s ease-in-out infinite":"none",
+              width: 130, height: 130, borderRadius: "50%",
+              background: listening ? "linear-gradient(135deg,#FF6B6B,#EE1111)" : loading ? "linear-gradient(135deg,#F59E0B,#FF8C42)" : "linear-gradient(135deg,#4F8EF7 0%,#6C63FF 55%,#A855F7 100%)",
+              boxShadow: listening ? "0 0 50px rgba(255,80,80,0.5)" : "0 8px 40px rgba(79,142,247,0.45)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 0.3s", position: "relative", overflow: "hidden",
+              animation: loading ? "pulseSoft 1s infinite" : listening ? "micBounce 0.5s infinite" : "none",
             }}>
-              <div style={{position:"absolute",top:"-50%",left:"-50%",width:"200%",height:"200%",background:"linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 50%)",borderRadius:"50%",pointerEvents:"none"}}/>
-              {loading?(
-                <div style={{display:"flex",gap:5}}>
-                  {[0,1,2].map(i=><div key={i} style={{width:9,height:9,borderRadius:"50%",background:"white",animation:`dotUp 0.8s ${i*0.15}s ease-in-out infinite`}}/>)}
+              <div style={{ position: "absolute", top: "-50%", left: "-50%", width: "200%", height: "200%", background: "linear-gradient(135deg,rgba(255,255,255,0.13) 0%,transparent 50%)", borderRadius: "50%", pointerEvents: "none" }} />
+              {loading ? (
+                <div style={{ display: "flex", gap: 5 }}>
+                  {[0, 1, 2].map(i => <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: "white", animation: `dotUp 0.8s ${i * 0.15}s ease-in-out infinite` }} />)}
                 </div>
-              ):listening?(
+              ) : listening ? (
                 <svg width="54" height="44" viewBox="0 0 54 44" fill="none">
-                  <rect x="0"  y="14" width="8" height="16" rx="4" fill="white" style={{animation:"waveBar 0.5s 0s ease-in-out infinite"}}/>
-                  <rect x="12" y="7"  width="8" height="30" rx="4" fill="white" style={{animation:"waveBar 0.5s 0.1s ease-in-out infinite"}}/>
-                  <rect x="24" y="2"  width="8" height="40" rx="4" fill="white" style={{animation:"waveBar 0.5s 0.2s ease-in-out infinite"}}/>
-                  <rect x="36" y="7"  width="8" height="30" rx="4" fill="white" style={{animation:"waveBar 0.5s 0.1s ease-in-out infinite"}}/>
-                  <rect x="46" y="14" width="8" height="16" rx="4" fill="white" style={{animation:"waveBar 0.5s 0.05s ease-in-out infinite"}}/>
+                  <rect x="0" y="14" width="8" height="16" rx="4" fill="white" style={{ animation: "waveBar 0.5s 0s ease-in-out infinite" }} />
+                  <rect x="12" y="7" width="8" height="30" rx="4" fill="white" style={{ animation: "waveBar 0.5s 0.1s ease-in-out infinite" }} />
+                  <rect x="24" y="2" width="8" height="40" rx="4" fill="white" style={{ animation: "waveBar 0.5s 0.2s ease-in-out infinite" }} />
+                  <rect x="36" y="7" width="8" height="30" rx="4" fill="white" style={{ animation: "waveBar 0.5s 0.1s ease-in-out infinite" }} />
+                  <rect x="46" y="14" width="8" height="16" rx="4" fill="white" style={{ animation: "waveBar 0.5s 0.05s ease-in-out infinite" }} />
                 </svg>
-              ):(
-                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                  <circle cx="28" cy="32" r="14" fill="rgba(255,255,255,0.2)" stroke="white" strokeWidth="2"/>
-                  <path d="M22 32 Q28 23 34 32 Q28 41 22 32Z" fill="white" opacity="0.9"/>
-                  <circle cx="28" cy="32" r="3.5" fill="white"/>
-                  <path d="M28 8 L29.4 12.5 L34 12.5 L30.3 15.2 L31.7 19.7 L28 17 L24.3 19.7 L25.7 15.2 L22 12.5 L26.6 12.5Z" fill="white" opacity="0.95"/>
-                  <path d="M43 19 L44 21.5 L46.5 21.5 L44.5 23 L45.5 25.5 L43 24 L40.5 25.5 L41.5 23 L39.5 21.5 L42 21.5Z" fill="white" opacity="0.75"/>
-                  <path d="M13 19 L14 21.5 L16.5 21.5 L14.5 23 L15.5 25.5 L13 24 L10.5 25.5 L11.5 23 L9.5 21.5 L12 21.5Z" fill="white" opacity="0.75"/>
+              ) : (
+                <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+                  <rect x="20" y="4" width="14" height="24" rx="7" fill="white" opacity="0.95" />
+                  <path d="M10 25a17 17 0 0 0 34 0" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="27" y1="42" x2="27" y2="50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="18" y1="50" x2="36" y2="50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                  <circle cx="43" cy="10" r="6" fill="#FFD700" />
+                  <path d="M40 10 L42 12 L47 7" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
               )}
             </div>
           </div>
-          <div style={{marginTop:10,fontSize:"0.85rem",fontWeight:700,color:listening?C.acc:loading?"#F59E0B":C.mut}}>
-            {listening?"🎙 Listening… speak now!":loading?"🤔 Bablo is thinking…":"Tap to speak with Bablo 🐼"}
+          <div style={{ marginTop: 10, fontSize: "0.84rem", fontWeight: 700, color: listening ? C.acc : loading ? "#F59E0B" : C.sec }}>
+            {listening ? "🎙 Listening… speak now!" : loading ? "🤔 Bablo is thinking…" : "🎤 Tap to speak → AI replies instantly"}
           </div>
-          {micStatusMsg&&(
-            <div style={{margin:"8px auto 0",maxWidth:320,fontSize:"0.72rem",color:micStatus==="blocked"?"#7C3AED":C.acc,padding:"7px 14px",background:micStatus==="blocked"?"#F5F0FF":"#FFF0F0",borderRadius:10,border:`1px solid ${micStatus==="blocked"?"#DDD0FF":"#FFCCCC"}`}}>
-              {micStatusMsg}
+          <div style={{ fontSize: "0.68rem", color: C.mut, marginTop: 2 }}>Big button = speak & auto-send | Small 🟢 mic = type only</div>
+          {micNote && (
+            <div style={{ margin: "8px auto 0", maxWidth: 320, fontSize: "0.72rem", padding: "7px 14px", background: micNote.startsWith("✅") ? "#F0FFF8" : micNote.startsWith("🔒") ? "#F5F0FF" : "#FFF0F0", color: micNote.startsWith("✅") ? C.grn : micNote.startsWith("🔒") ? "#7C3AED" : C.acc, borderRadius: 10 }}>
+              {micNote}
             </div>
           )}
         </div>
 
         {/* Chat messages */}
-        <div style={{...card,marginBottom:12}}>
-          <div style={{minHeight:180,maxHeight:300,overflowY:"auto",padding:"4px 2px",marginBottom:10}}>
-            {msgs.map((m,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"flex-end",gap:8,marginBottom:10,flexDirection:m.r==="ai"?"row":"row-reverse",animation:"fadeUp 0.3s ease"}}>
-                {m.r==="ai"&&<div style={{fontSize:"1.4rem",flexShrink:0}}>🐼</div>}
-                <div style={{maxWidth:"82%",padding:"11px 15px",lineHeight:1.65,fontSize:"0.87rem",whiteSpace:"pre-wrap",
-                  borderRadius:m.r==="ai"?"18px 18px 18px 4px":"18px 18px 4px 18px",
-                  background:m.r==="ai"?`linear-gradient(135deg,${C.pri},${C.sec})`:`linear-gradient(135deg,${C.grn},#22C993)`,
-                  color:"white",boxShadow:"0 3px 12px rgba(0,0,0,0.1)"}}>{m.t}</div>
+        <div style={{ ...card, marginBottom: 12 }}>
+          <div style={{ minHeight: 160, maxHeight: 280, overflowY: "auto", padding: "4px 2px", marginBottom: 10 }}>
+            {msgs.map((m, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 10, flexDirection: m.r === "ai" ? "row" : "row-reverse", animation: "fadeUp 0.3s ease" }}>
+                {m.r === "ai" && <div style={{ fontSize: "1.5rem", flexShrink: 0 }}>🐼</div>}
+                <div style={{ maxWidth: "83%", padding: "11px 15px", lineHeight: 1.7, fontSize: "0.87rem", whiteSpace: "pre-wrap", borderRadius: m.r === "ai" ? "18px 18px 18px 4px" : "18px 18px 4px 18px", background: m.r === "ai" ? `linear-gradient(135deg,${C.pri},${C.sec})` : `linear-gradient(135deg,${C.grn},#22C993)`, color: "white", boxShadow: "0 3px 12px rgba(0,0,0,0.1)" }}>{m.t}</div>
               </div>
             ))}
-            {loading&&(
-              <div style={{display:"flex",alignItems:"center",gap:8,animation:"fadeUp 0.3s ease"}}>
-                <div style={{fontSize:"1.4rem"}}>🐼</div>
-                <div style={{padding:"11px 16px",borderRadius:"18px 18px 18px 4px",background:`linear-gradient(135deg,${C.pri},${C.sec})`,display:"flex",gap:5}}>
-                  {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:"white",animation:`dotUp 0.75s ${i*0.15}s ease-in-out infinite`}}/>)}
+            {loading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, animation: "fadeUp 0.3s ease" }}>
+                <div style={{ fontSize: "1.5rem" }}>🐼</div>
+                <div style={{ padding: "11px 18px", borderRadius: "18px 18px 18px 4px", background: `linear-gradient(135deg,${C.pri},${C.sec})`, display: "flex", gap: 6 }}>
+                  {[0, 1, 2].map(i => <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: "white", animation: `dotUp 0.75s ${i * 0.15}s ease-in-out infinite` }} />)}
                 </div>
               </div>
             )}
-            <div ref={endRef}/>
+            <div ref={endRef} />
           </div>
 
           {/* Input + small mic + send */}
-          <div style={{display:"flex",gap:7,alignItems:"center"}}>
-            <input value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}}
-              placeholder={chatLang==="ur"?"یہاں لکھیں (اردو یا انگریزی)…":"Type here (English or Urdu)…"}
-              dir={chatLang==="ur"?"rtl":"ltr"}
-              style={{flex:1,border:"2px solid #E0E8FF",borderRadius:50,padding:"11px 16px",fontSize:"0.87rem",outline:"none",fontFamily:"inherit",background:"#F8F9FF"}}/>
-            {/* Small mic button */}
-            <button onClick={tryMic} title="Speak" style={{
-              width:44,height:44,borderRadius:"50%",border:"none",cursor:"pointer",flexShrink:0,
-              background:listening?"linear-gradient(135deg,#FF6B6B,#EE1111)":"linear-gradient(135deg,#4F8EF7,#6C63FF)",
-              boxShadow:listening?"0 0 16px rgba(255,80,80,0.4)":"0 3px 12px rgba(79,142,247,0.35)",
-              display:"flex",alignItems:"center",justifyContent:"center",
-              animation:listening?"micBounce 0.5s ease-in-out infinite":"none",
-              transition:"all 0.2s"}}>
+          <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+            <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+              placeholder={chatLang === "ur" ? "یہاں لکھیں…" : "Type here (English or Urdu)…"}
+              dir={chatLang === "ur" ? "rtl" : "ltr"}
+              style={{ flex: 1, border: "2px solid #E0E8FF", borderRadius: 50, padding: "11px 16px", fontSize: "0.87rem", outline: "none", fontFamily: "inherit", background: "#F8F9FF" }} />
+            <button onClick={startSmallMic} title="Speak to type (does not auto-send)" style={{
+              width: 44, height: 44, borderRadius: "50%", border: "none", cursor: "pointer", flexShrink: 0,
+              background: listening ? "linear-gradient(135deg,#FF6B6B,#EE1111)" : "linear-gradient(135deg,#43D19E,#22B384)",
+              boxShadow: listening ? "0 0 16px rgba(255,80,80,0.4)" : "0 3px 10px rgba(67,209,158,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              animation: listening ? "micBounce 0.5s infinite" : "none", transition: "all 0.2s"
+            }}>
               {listening
-                ?<svg width="18" height="16" viewBox="0 0 18 16" fill="none">
-                  <rect x="1"  y="5" width="3" height="6"  rx="1.5" fill="white" style={{animation:"waveBar 0.5s 0s ease-in-out infinite"}}/>
-                  <rect x="5"  y="2" width="3" height="12" rx="1.5" fill="white" style={{animation:"waveBar 0.5s 0.1s ease-in-out infinite"}}/>
-                  <rect x="9"  y="0" width="3" height="16" rx="1.5" fill="white" style={{animation:"waveBar 0.5s 0.2s ease-in-out infinite"}}/>
-                  <rect x="13" y="3" width="3" height="10" rx="1.5" fill="white" style={{animation:"waveBar 0.5s 0.1s ease-in-out infinite"}}/>
-                </svg>
-                :<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <rect x="9" y="2" width="6" height="12" rx="3" fill="white"/>
-                  <path d="M5 11a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="8"  y1="22" x2="16" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
+                ? <svg width="16" height="14" viewBox="0 0 16 14" fill="none"><rect x="0" y="4" width="3" height="6" rx="1.5" fill="white" style={{ animation: "waveBar 0.5s 0s ease-in-out infinite" }} /><rect x="4" y="1" width="3" height="12" rx="1.5" fill="white" style={{ animation: "waveBar 0.5s 0.1s ease-in-out infinite" }} /><rect x="8" y="0" width="3" height="14" rx="1.5" fill="white" style={{ animation: "waveBar 0.5s 0.2s ease-in-out infinite" }} /><rect x="12" y="3" width="3" height="8" rx="1.5" fill="white" style={{ animation: "waveBar 0.5s 0.1s ease-in-out infinite" }} /></svg>
+                : <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" fill="white" /><path d="M5 11a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" strokeLinecap="round" /><line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round" /><line x1="8" y1="22" x2="16" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round" /></svg>
               }
             </button>
-            {/* Send */}
-            <button onClick={()=>send()} disabled={loading||!input.trim()} style={{
-              width:44,height:44,borderRadius:"50%",border:"none",cursor:"pointer",flexShrink:0,
-              background:loading||!input.trim()?"#E0E8FF":`linear-gradient(135deg,${C.pri},${C.sec})`,
-              display:"flex",alignItems:"center",justifyContent:"center",
-              boxShadow:loading||!input.trim()?"none":"0 3px 12px rgba(79,142,247,0.4)",transition:"all 0.2s"}}>
+            <button onClick={() => send()} disabled={loading || !input.trim()} style={{
+              width: 44, height: 44, borderRadius: "50%", border: "none", cursor: "pointer", flexShrink: 0,
+              background: loading || !input.trim() ? "#E0E8FF" : `linear-gradient(135deg,${C.pri},${C.sec})`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: loading || !input.trim() ? "none" : "0 3px 12px rgba(79,142,247,0.4)", transition: "all 0.2s"
+            }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M22 2L11 13" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M22 2L11 13" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
+          </div>
+          <div style={{ fontSize: "0.67rem", color: C.mut, textAlign: "center", marginTop: 6 }}>
+            🟢 Small mic = speak to TYPE only &nbsp;|&nbsp; 🔵 Big button = speak & SEND
           </div>
         </div>
 
         {/* Quick prompts */}
-        <div style={{...card,background:"linear-gradient(135deg,#F5F0FF,#F0F5FF)",border:`1.5px solid ${C.sec}25`}}>
-          <div style={{fontSize:"0.78rem",fontWeight:800,color:C.sec,marginBottom:8}}>💡 Tap to ask Bablo:</div>
-          <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
-            {quickBtns.map((s,i)=>(
-              <button key={i} onClick={()=>send(s)} disabled={loading}
-                style={{background:"white",border:`1.5px solid ${C.sec}35`,borderRadius:50,padding:"6px 13px",fontSize:"0.75rem",color:C.sec,cursor:"pointer",fontFamily:"inherit",fontWeight:600,transition:"all 0.15s"}}
-                onMouseEnter={e=>{e.currentTarget.style.background=C.sec;e.currentTarget.style.color="white";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="white";e.currentTarget.style.color=C.sec;}}
-              >{s}</button>
+        <div style={{ ...card, background: "linear-gradient(135deg,#F5F0FF,#F0F5FF)", border: `1.5px solid ${C.sec}25` }}>
+          <div style={{ fontSize: "0.78rem", fontWeight: 800, color: C.sec, marginBottom: 8 }}>💡 Tap to ask Bablo:</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            {quickBtns.map((s, i) => (
+              <button key={i} onClick={() => send(s)} disabled={loading}
+                style={{ background: "white", border: `1.5px solid ${C.sec}35`, borderRadius: 50, padding: "6px 13px", fontSize: "0.74rem", color: C.sec, cursor: "pointer", fontFamily: "inherit", fontWeight: 600, transition: "all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.background = C.sec; e.currentTarget.style.color = "white"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "white"; e.currentTarget.style.color = C.sec; }}>
+                {s}
+              </button>
             ))}
           </div>
         </div>
@@ -733,7 +706,7 @@ function BabloApp() {
       <div style={{...card,background:"linear-gradient(135deg,#F5F0FF,#F0F5FF)",border:`2px solid ${C.sec}20`}}>
         <div style={{fontSize:"0.77rem",color:C.mut,marginBottom:2}}>Created by</div>
         <div style={{fontWeight:900,color:C.sec,fontSize:"1.1rem",fontFamily:"'Nunito',sans-serif"}}>Muhammad Usman</div>
-        <div style={{fontSize:"0.69rem",color:C.mut,marginTop:3}}>🐼 Bablo Learning AI · 2026</div>
+        <div style={{fontSize:"0.69rem",color:C.mut,marginTop:3}}>🐼 Bablo Learning AI · 2024</div>
       </div>
     </div>
   );
@@ -801,9 +774,3 @@ function BabloApp() {
     </>
   );
 }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<BabloApp />);
-  </script>
-</body>
-</html>
