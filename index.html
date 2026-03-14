@@ -401,23 +401,38 @@ function BabloApp() {
         : `You are Bablo — a highly intelligent warm AI panda English tutor with full knowledge like ChatGPT. RULES: 1) NEVER repeat the same answer — always give fresh unique responses 2) Read user message carefully and respond SPECIFICALLY to what they said 3) Understand Urdu/Hindi and reply helpfully 4) Gently correct grammar mistakes 5) Give 3-4 sentence responses 6) End with a follow-up question 7) Vary your tone and content completely each time — never say the same phrase twice.`;
       try {
         // Use corsproxy.io to bypass CORS — works from any static site
-        const PROXY = "https://corsproxy.io/?url=https://api.anthropic.com/v1/messages";
-        const res = await fetch(PROXY, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "sk-ant-api03-placeholder",
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
-          },
-          body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 400, system: sys, messages: history })
-        });
-        if (!res.ok) throw new Error("api_fail");
-        const d = await res.json();
-        const reply = d?.content?.[0]?.text;
-        if (reply) { setMsgs(m => [...m, { r: "ai", t: reply }]); }
-        else throw new Error("empty");
-      } catch(err) {
+        const GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+
+const res = await fetch(
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + GEMINI_API_KEY,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({
+contents:[
+{
+parts:[
+{
+text: sys + "\nUser: " + text
+}
+]
+}
+]
+})
+}
+);
+
+const data = await res.json();
+
+const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+if(reply){
+setMsgs(m => [...m,{r:"ai",t:reply}]);
+}else{
+throw new Error("empty");
+}
         // Fallback: smart local responses when API unavailable
         const fallbacks_en = [
           "Great question! In English, we use 'What is your favourite food?' — note the word 'favourite' has a 'u' in British spelling! What food do you like? 🍕",
