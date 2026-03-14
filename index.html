@@ -916,307 +916,6 @@ function BabloApp() {
     );
   };
 
-  /* ── PDF BOOK READERS ── */
-  const PdfBookReader = ({title, emoji, color, bg, filename, pages, desc}) => {
-    return (
-      <div style={{direction:"ltr"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-          <button style={btnS()} onClick={()=>setPage("home")}>← Back</button>
-          <div style={{flex:1}}>
-            <h2 style={{margin:0,fontFamily:"'Nunito',sans-serif",color:color,fontSize:"1rem"}}>{emoji} {title}</h2>
-            <div style={{fontSize:"0.68rem",color:C.mut}}>{desc}</div>
-          </div>
-        </div>
-
-        {/* Book cover card */}
-        <div style={{...card,marginBottom:14,background:bg,border:`2px solid ${color}30`,textAlign:"center",padding:"24px 16px"}}>
-          <div style={{fontSize:"4rem",marginBottom:10}}>{emoji}</div>
-          <div style={{fontWeight:900,color:color,fontSize:"1.1rem",marginBottom:4,fontFamily:"'Nunito',sans-serif"}}>{title}</div>
-          <div style={{fontSize:"0.78rem",color:C.mut,marginBottom:6}}>by Idries Shah</div>
-          <div style={{fontSize:"0.72rem",color:C.mut,marginBottom:20,background:"white",borderRadius:10,padding:"6px 12px",display:"inline-block"}}>{pages} pages · Illustrated</div>
-
-          {/* Open PDF button */}
-          <div style={{marginBottom:10}}>
-            <a href={filename} target="_blank" style={{
-              display:"block",background:`linear-gradient(135deg,${color},${color}BB)`,
-              color:"white",textDecoration:"none",borderRadius:14,padding:"14px 20px",
-              fontWeight:800,fontSize:"0.95rem",fontFamily:"inherit",
-              boxShadow:`0 6px 20px ${color}40`,marginBottom:10
-            }}>
-              📖 Open Full Book
-            </a>
-            <div style={{fontSize:"0.7rem",color:C.mut}}>Opens as PDF — pinch to zoom, swipe to read</div>
-          </div>
-        </div>
-
-        {/* Embed PDF viewer */}
-        <div style={{...card,padding:0,overflow:"hidden",borderRadius:16}}>
-          <div style={{background:`${color}15`,padding:"10px 14px",borderBottom:`1px solid ${color}20`}}>
-            <div style={{fontSize:"0.78rem",fontWeight:700,color:color}}>📄 Preview below — or tap "Open Full Book" above for best experience</div>
-          </div>
-          <iframe
-            src={filename}
-            width="100%"
-            height="500px"
-            style={{border:"none",display:"block"}}
-            title={title}
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const OnionReader = () => (
-    <PdfBookReader
-      title="The Onion"
-      emoji="🧅"
-      color="#F97316"
-      bg="#FFF7ED"
-      filename="the_onion.pdf"
-      pages={28}
-      desc="by Idries Shah · Illustrated by Daby Zainab Faidhi"
-    />
-  );
-
-  const AntsReader = () => (
-    <PdfBookReader
-      title="The Ants and the Pen"
-      emoji="🐜"
-      color="#DC2626"
-      bg="#FFF0F0"
-      filename="ants_and_pen.pdf"
-      pages={27}
-      desc="by Idries Shah · Illustrated by Prashant Miranda"
-    />
-  );
-
-  /* ── VOCABULARY ── */  /* ── VOCABULARY ── */
-  const Vocab = () => {
-    const [idx,setIdx]=useState(0);
-    const [flipped,setFlipped]=useState(false);
-    const [filter,setFilter]=useState("all");
-    const filtered=filter==="all"?VOCAB:VOCAB.filter(v=>v.cat===filter);
-    const v=filtered[idx%filtered.length];
-    return(
-      <div style={{direction:isRTL?"rtl":"ltr"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-          <button style={btnS()} onClick={()=>setPage("home")}>← Back</button>
-          <h2 style={{margin:0,fontFamily:"'Nunito',sans-serif",color:C.txt}}>✨ Vocabulary ({VOCAB.length})</h2>
-        </div>
-        <div style={{display:"flex",gap:5,overflowX:"auto",marginBottom:12,paddingBottom:3}}>
-          {["all","Life","Daily","Story","Speaking","Describe","Advanced"].map(c=>(
-            <button key={c} onClick={()=>{setFilter(c);setIdx(0);setFlipped(false);}} style={{...btnS(),padding:"5px 10px",fontSize:"0.71rem",whiteSpace:"nowrap",background:filter===c?C.pri:"transparent",color:filter===c?"white":C.pri}}>{c}</button>
-          ))}
-        </div>
-        <div onClick={()=>setFlipped(f=>!f)} style={{background:flipped?"linear-gradient(135deg,#6C63FF,#4F8EF7)":"linear-gradient(135deg,#4F8EF7,#6C63FF)",borderRadius:24,padding:"30px 20px",textAlign:"center",marginBottom:16,cursor:"pointer",minHeight:160,boxShadow:"0 8px 28px rgba(79,142,247,0.25)",animation:"fadeUp 0.4s ease"}}>
-          {!flipped?(
-            <>
-              <div style={{fontSize:"0.75rem",color:"rgba(255,255,255,0.7)",marginBottom:8}}>Tap card to see meaning</div>
-              <div style={{fontSize:"2.4rem",fontWeight:900,color:"white",fontFamily:"'Nunito',sans-serif",marginBottom:4}}>{v.word}</div>
-              {lang!=="en"&&<div style={{fontSize:"1.4rem",color:"rgba(255,255,255,0.87)",fontFamily:"'Noto Nastaliq Urdu',serif"}}>{v.urdu}</div>}
-              <div style={{fontSize:"0.7rem",color:"rgba(255,255,255,0.6)",marginTop:6}}>Category: {v.cat}</div>
-            </>
-          ):(
-            <>
-              <div style={{fontSize:"0.75rem",color:"rgba(255,255,255,0.7)",marginBottom:8}}>📖 Meaning</div>
-              <div style={{fontSize:"0.98rem",color:"white",lineHeight:1.65,marginBottom:8}}>{v.meaning}</div>
-              <div style={{background:"rgba(255,255,255,0.15)",borderRadius:12,padding:"8px 14px",fontSize:"0.84rem",color:"white",fontStyle:"italic"}}>"{v.example}"</div>
-            </>
-          )}
-        </div>
-        <div style={{display:"flex",gap:9,justifyContent:"center",marginBottom:16}}>
-          <button onClick={()=>{setIdx(i=>(i-1+filtered.length)%filtered.length);setFlipped(false);}} style={btnS()}>← Prev</button>
-          <span style={{color:C.mut,alignSelf:"center",fontSize:"0.8rem"}}>{(idx%filtered.length)+1}/{filtered.length}</span>
-          <button onClick={()=>{setIdx(i=>(i+1)%filtered.length);setFlipped(false);addStar();}} style={btnP}>Next →</button>
-        </div>
-        <div style={card}>
-          <h3 style={{margin:"0 0 10px",fontFamily:"'Nunito',sans-serif",color:C.txt,fontSize:"0.91rem"}}>📋 Word List</h3>
-          <div style={{maxHeight:280,overflowY:"auto"}}>
-            {filtered.map((item,i)=>(
-              <div key={i} onClick={()=>{setIdx(i);setFlipped(false);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:i<filtered.length-1?"1px solid #F0F4FF":"none",cursor:"pointer"}}>
-                <div>
-                  <span style={{fontWeight:700,color:i===idx%filtered.length?C.pri:C.txt,fontSize:"0.85rem"}}>{item.word}</span>
-                  {lang!=="en"&&<span style={{color:C.sec,marginLeft:8,fontSize:"0.78rem",fontFamily:"'Noto Nastaliq Urdu',serif"}}>{item.urdu}</span>}
-                  <span style={{marginLeft:7,fontSize:"0.63rem",background:`${C.pri}15`,color:C.pri,borderRadius:50,padding:"1px 6px"}}>{item.cat}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  /* ── CONVERSATIONS ── */
-  const Conversations = () => {
-    const [sel,setSel]=useState(null);
-    const [step,setStep]=useState(0);
-    const [done,setDone]=useState(false);
-    if(sel){
-      const conv=CONVS.find(c=>c.id===sel);
-      return(
-        <div style={{direction:isRTL?"rtl":"ltr",animation:"fadeUp 0.4s ease"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:13}}>
-            <button style={btnS()} onClick={()=>{setSel(null);setStep(0);setDone(false);}}>← Back</button>
-            <div style={{fontWeight:900,color:C.txt,fontFamily:"'Nunito',sans-serif"}}>{conv.icon} {lang==="ur"?conv.topicUr:conv.topicEn}</div>
-          </div>
-          <div style={{...card,marginBottom:12,minHeight:260}}>
-            {conv.exchanges.slice(0,step+1).map((ex,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"flex-end",gap:8,marginBottom:10,flexDirection:ex.r==="ai"?"row":"row-reverse",animation:"fadeUp 0.3s ease"}}>
-                {ex.r==="ai"&&<div style={{fontSize:"1.3rem"}}>🐼</div>}
-                <div style={{maxWidth:"78%",padding:"10px 14px",borderRadius:ex.r==="ai"?"16px 16px 16px 3px":"16px 16px 3px 16px",background:ex.r==="ai"?`linear-gradient(135deg,${conv.color}EE,${conv.color})`:"linear-gradient(135deg,#43D19E,#38B28A)",color:"white",fontSize:"0.87rem",lineHeight:1.6}}>
-                  {lang!=="ur"&&<div>{ex.en}</div>}
-                  {lang!=="en"&&<div style={{fontFamily:"'Noto Nastaliq Urdu',serif",direction:"rtl",opacity:0.93,fontSize:"0.83rem",marginTop:lang==="enur"?4:0}}>{ex.ur}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-          {!done?(
-            <button style={{...btnP,width:"100%"}} onClick={()=>{
-              if(step<conv.exchanges.length-1){setStep(s=>s+1);}
-              else{setDone(true);addStar();}
-            }}>
-              {step<conv.exchanges.length-1
-                ?(conv.exchanges[step]?.r==="user"?"🎤 My turn — say it!":"Next ➤")
-                :"✅ Finish"}
-            </button>
-          ):(
-            <div style={{textAlign:"center",animation:"fadeUp 0.4s ease"}}>
-              <div style={{fontSize:"2.5rem",marginBottom:5}}>🎉</div>
-              <div style={{fontWeight:800,color:C.grn,marginBottom:11,fontFamily:"'Nunito',sans-serif"}}>Well done! +1 ⭐</div>
-              <button style={{...btnP,background:"linear-gradient(135deg,#43D19E,#38B28A)"}} onClick={()=>{setStep(0);setDone(false);}}>🔄 Again</button>
-            </div>
-          )}
-        </div>
-      );
-    }
-    return(
-      <div style={{direction:isRTL?"rtl":"ltr"}}>
-        <h2 style={{fontFamily:"'Nunito',sans-serif",color:C.txt,marginTop:0}}>💬 Daily Conversations</h2>
-        <p style={{color:C.mut,fontSize:"0.81rem",marginBottom:13}}>Tap any topic to start practising!</p>
-        <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10}}>
-          {CONVS.map((c,i)=>(
-            <div key={c.id} onClick={()=>{setSel(c.id);setStep(0);setDone(false);}} style={{...card,display:"flex",alignItems:"center",gap:12,cursor:"pointer",transition:"transform 0.18s,box-shadow 0.18s",animation:`fadeUp ${0.2+i*0.04}s ease`,borderLeft:`4px solid ${c.color}`}}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateX(5px)";e.currentTarget.style.boxShadow=`0 6px 22px ${c.color}30`;}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
-              <div style={{width:46,height:46,borderRadius:14,flexShrink:0,background:`${c.color}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.45rem"}}>{c.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:800,color:C.txt,fontSize:"0.88rem",fontFamily:"'Nunito',sans-serif"}}>{lang==="ur"?c.topicUr:c.topicEn}</div>
-                {lang==="enur"&&<div style={{fontSize:"0.72rem",color:"#7C4FC8",fontFamily:"'Noto Nastaliq Urdu',serif",direction:"rtl"}}>{c.topicUr}</div>}
-                <div style={{fontSize:"0.69rem",color:C.mut,marginTop:1}}>{c.exchanges.length} exchanges</div>
-              </div>
-              <div style={{color:c.color,fontSize:"1.2rem"}}>▶</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  /* ── PROGRESS ── */
-  const Progress = () => (
-    <div style={{direction:isRTL?"rtl":"ltr"}}>
-      <h2 style={{fontFamily:"'Nunito',sans-serif",color:C.txt,marginTop:0}}>📊 My Progress</h2>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:11,marginBottom:15}}>
-        {[["⭐",stars,"Stars",C.yel],["🔥",streak,"Streak",C.acc],["📚","12","Books",C.pri],["💬","10","Topics",C.grn]].map(([ic,v,l,c],i)=>(
-          <div key={i} style={{...card,textAlign:"center",padding:14}}>
-            <div style={{fontSize:"1.7rem",fontWeight:900,color:c,fontFamily:"'Nunito',sans-serif"}}>{ic} {v}</div>
-            <div style={{fontSize:"0.7rem",color:C.mut,marginTop:2}}>{l}</div>
-          </div>
-        ))}
-      </div>
-      <div style={card}>
-        <h3 style={{margin:"0 0 12px",fontFamily:"'Nunito',sans-serif",color:C.txt,fontSize:"0.91rem"}}>📈 Skills</h3>
-        {[["Speaking",70,C.acc],["Reading",65,C.pri],["Vocabulary",55,C.grn],["Conversation",48,C.sec]].map(([l,p,c])=>(
-          <div key={l} style={{marginBottom:12}}>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.8rem",fontWeight:600,marginBottom:4}}>
-              <span style={{color:C.txt}}>{l}</span><span style={{color:c}}>{p}%</span>
-            </div>
-            <div style={{height:9,background:"#F0F4FF",borderRadius:50}}>
-              <div style={{height:"100%",width:p+"%",borderRadius:50,background:`linear-gradient(90deg,${c},${c}88)`}}/>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  /* ── ABOUT ── */
-  const About = () => (
-    <div style={{direction:isRTL?"rtl":"ltr",textAlign:"center"}}>
-      <div style={{marginBottom:12}}><PandaMascot size={92} animate/></div>
-      <h2 style={{fontFamily:"'Nunito',sans-serif",color:C.txt,marginTop:0}}>About Bablo</h2>
-      <p style={{color:C.mut,lineHeight:1.8,maxWidth:360,margin:"0 auto 18px",fontSize:"0.85rem"}}>Bablo is your friendly AI language tutor. Read amazing stories, chat with AI, build vocabulary — your way, any time! 🐼</p>
-      <div style={{...card,background:"linear-gradient(135deg,#F5F0FF,#F0F5FF)",border:`2px solid ${C.sec}20`}}>
-        <div style={{fontSize:"0.77rem",color:C.mut,marginBottom:2}}>Created by</div>
-        <div style={{fontWeight:900,color:C.sec,fontSize:"1.1rem",fontFamily:"'Nunito',sans-serif"}}>Muhammad Usman</div>
-        <div style={{fontSize:"0.69rem",color:C.mut,marginTop:3}}>🐼 Bablo Learning AI · 2024</div>
-      </div>
-    </div>
-  );
-
-  /* ── COMIC READER ── */
-  const ComicReader = () => {
-    const [pg, setPg] = useState(0);
-    const [zoom, setZoom] = useState(false);
-    const total = SPIDERMAN_PAGES.length;
-    return (
-      <div style={{direction:"ltr"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-          <button style={btnS()} onClick={()=>setPage("home")}>← Back</button>
-          <div style={{flex:1}}>
-            <h2 style={{margin:0,fontFamily:"'Nunito',sans-serif",color:"#E11D48",fontSize:"1rem"}}>🕷️ Spider-Man: Meals to Astonish</h2>
-            <div style={{fontSize:"0.68rem",color:C.mut}}>Issue #1 · 2026 · Page {pg+1} of {total}</div>
-          </div>
-        </div>
-
-        {/* Progress bar */}
-        <div style={{height:4,background:"#F0F0F0",borderRadius:50,marginBottom:12,overflow:"hidden"}}>
-          <div style={{height:"100%",width:`${((pg+1)/total)*100}%`,background:"linear-gradient(90deg,#E11D48,#FF6B6B)",borderRadius:50,transition:"width 0.4s ease"}}/>
-        </div>
-
-        {/* Comic page image */}
-        <div onClick={()=>setZoom(z=>!z)} style={{cursor:"zoom-in",borderRadius:16,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,0.18)",marginBottom:14,background:"#111",position:"relative"}}>
-          <img
-            src={SPIDERMAN_PAGES[pg]}
-            alt={`Page ${pg+1}`}
-            style={{width:"100%",display:"block",transition:"transform 0.3s",transform:zoom?"scale(1.5) translateY(10%)":"scale(1)",transformOrigin:"top center"}}
-          />
-          <div style={{position:"absolute",bottom:8,right:8,background:"rgba(0,0,0,0.55)",color:"white",fontSize:"0.65rem",padding:"3px 8px",borderRadius:50}}>
-            {zoom?"🔍 Tap to zoom out":"🔍 Tap to zoom in"}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"center",marginBottom:14}}>
-          <button onClick={()=>{setPg(p=>Math.max(0,p-1));setZoom(false);}} disabled={pg===0}
-            style={{...btnS("#E11D48"),padding:"10px 20px",fontSize:"0.85rem",opacity:pg===0?0.4:1}}>← Prev</button>
-          <div style={{textAlign:"center"}}>
-            <div style={{fontWeight:800,color:"#E11D48",fontSize:"1rem"}}>{pg+1}</div>
-            <div style={{fontSize:"0.65rem",color:C.mut}}>of {total}</div>
-          </div>
-          <button onClick={()=>{if(pg<total-1){setPg(p=>p+1);setZoom(false);}else{addStar();}}}
-            style={{...btnP,background:"linear-gradient(135deg,#E11D48,#FF4D6D)",padding:"10px 20px",fontSize:"0.85rem"}}>
-            {pg===total-1?"✅ Done ⭐":"Next →"}
-          </button>
-        </div>
-
-        {/* Thumbnail strip */}
-        <div style={{...card,padding:"10px 8px"}}>
-          <div style={{fontSize:"0.75rem",fontWeight:700,color:C.mut,marginBottom:8}}>📑 All Pages</div>
-          <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4}}>
-            {SPIDERMAN_PAGES.map((src,i)=>(
-              <div key={i} onClick={()=>{setPg(i);setZoom(false);}} style={{flexShrink:0,cursor:"pointer",borderRadius:8,overflow:"hidden",border:`2px solid ${i===pg?"#E11D48":"transparent"}`,width:52,transition:"all 0.2s"}}>
-                <img src={src} alt={`p${i+1}`} style={{width:"100%",display:"block"}}/>
-                <div style={{textAlign:"center",fontSize:"0.55rem",color:i===pg?"#E11D48":C.mut,fontWeight:700,padding:"1px 0"}}>{i+1}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   /* ── THE ONION READER ── */
   const OnionReader = () => {
     const [pg, setPg] = useState(0);
@@ -1262,6 +961,36 @@ function BabloApp() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const AntsReader = () => {
+    return (
+      <div style={{direction:"ltr"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+          <button style={btnS()} onClick={()=>setPage("home")}>← Back</button>
+          <div style={{flex:1}}>
+            <h2 style={{margin:0,fontFamily:"'Nunito',sans-serif",color:"#DC2626",fontSize:"1rem"}}>🐜 The Ants and the Pen</h2>
+            <div style={{fontSize:"0.68rem",color:C.mut}}>by Idries Shah · 27 pages</div>
+          </div>
+        </div>
+        <div style={{...card,marginBottom:14,background:"#FFF0F0",border:"2px solid #DC262630",textAlign:"center",padding:"24px 16px"}}>
+          <div style={{fontSize:"4rem",marginBottom:10}}>🐜</div>
+          <div style={{fontWeight:900,color:"#DC2626",fontSize:"1.1rem",marginBottom:4,fontFamily:"'Nunito',sans-serif"}}>The Ants and the Pen</div>
+          <div style={{fontSize:"0.78rem",color:C.mut,marginBottom:6}}>by Idries Shah</div>
+          <div style={{fontSize:"0.72rem",color:C.mut,marginBottom:20,background:"white",borderRadius:10,padding:"6px 12px",display:"inline-block"}}>Illustrated by Prashant Miranda · 27 pages</div>
+          <a href="ants_and_pen.pdf" target="_blank" style={{display:"block",background:"linear-gradient(135deg,#DC2626,#EF4444)",color:"white",textDecoration:"none",borderRadius:14,padding:"14px 20px",fontWeight:800,fontSize:"0.95rem",fontFamily:"inherit",boxShadow:"0 6px 20px #DC262640",marginBottom:10}}>
+            📖 Open Full Book (PDF)
+          </a>
+          <div style={{fontSize:"0.7rem",color:C.mut}}>Pinch to zoom · Swipe to read</div>
+        </div>
+        <div style={{...card,padding:0,overflow:"hidden",borderRadius:16}}>
+          <div style={{background:"#DC262615",padding:"10px 14px",borderBottom:"1px solid #DC262620"}}>
+            <div style={{fontSize:"0.78rem",fontWeight:700,color:"#DC2626"}}>📄 Preview — tap "Open Full Book" for best experience</div>
+          </div>
+          <iframe src="ants_and_pen.pdf" width="100%" height="500px" style={{border:"none",display:"block"}} title="The Ants and the Pen"/>
         </div>
       </div>
     );
